@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screenshot - 网页截图工具</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff8fa3;
+            --primary-dark: #ff6b85;
+            --primary-light: #ffc2cd;
+            --primary-soft: #ffe4e9;
+            --secondary: #ffd6e0;
+            --bg-gradient-start: #fff5f7;
+            --bg-gradient-end: #ffeef2;
+            --text-dark: #5a3d44;
+            --text-medium: #8b6b73;
+            --text-light: #b89aa1;
+            --white: #ffffff;
+            --shadow-soft: 0 8px 32px rgba(255, 143, 163, 0.15);
+            --shadow-hover: 0 12px 40px rgba(255, 143, 163, 0.25);
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            color: var(--text-medium);
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Language Selector */
+        .lang-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            padding: 8px;
+            box-shadow: var(--shadow-soft);
+            z-index: 100;
+            display: flex;
+            gap: 4px;
+        }
+
+        .lang-btn {
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+
+        .lang-btn:hover {
+            color: var(--primary);
+            background: var(--primary-soft);
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+        }
+
+        /* Main Card */
+        .main-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 30px;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        /* Input Section */
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .url-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 16px 24px;
+            border: 2px solid var(--primary-soft);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            color: var(--text-dark);
+        }
+
+        .url-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255, 143, 163, 0.15);
+        }
+
+        .url-input::placeholder {
+            color: var(--text-light);
+        }
+
+        .capture-btn {
+            padding: 16px 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(255, 107, 133, 0.3);
+        }
+
+        .capture-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .capture-btn:active {
+            transform: translateY(0);
+        }
+
+        .capture-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Options Section */
+        .options-section {
+            background: var(--primary-soft);
+            border-radius: var(--radius-md);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .options-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .option-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-medium);
+        }
+
+        .option-input {
+            padding: 12px 16px;
+            border: 2px solid var(--primary-light);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        .option-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        select.option-input {
+            cursor: pointer;
+        }
+
+        /* Result Section */
+        .result-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .result-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .download-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .screenshot-container {
+            background: var(--primary-soft);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            text-align: center;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .screenshot-img {
+            max-width: 100%;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--primary-soft);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        .loading-text {
+            color: var(--text-medium);
+            font-size: 1rem;
+        }
+
+        /* Features */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            text-align: center;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary-soft) 0%, var(--secondary) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 20px;
+        }
+
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            color: var(--text-medium);
+            font-size: 0.95rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            .logo h1 {
+                font-size: 1.8rem;
+            }
+
+            .main-card {
+                padding: 25px;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .url-input {
+                width: 100%;
+            }
+
+            .capture-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .lang-selector {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 20px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+        }
+
+        /* Hidden iframe for screenshot */
+        #captureFrame {
+            position: absolute;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Selector -->
+    <div class="lang-selector">
+        <button class="lang-btn active" data-lang="zh">中文</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="es">ES</button>
+        <button class="lang-btn" data-lang="ja">日本語</button>
+        <button class="lang-btn" data-lang="ko">한국어</button>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">📸</div>
+                <h1 data-i18n="title">Screenshot</h1>
+            </div>
+            <p class="tagline" data-i18n="tagline">轻松截取网页截图，支持自定义尺寸</p>
+        </header>
+
+        <div class="main-card">
+            <div class="input-section">
+                <div class="input-group">
+                    <input type="url" class="url-input" id="urlInput" placeholder="https://example.com" data-i18n-placeholder="urlPlaceholder">
+                    <button class="capture-btn" id="captureBtn">
+                        <span>📷</span>
+                        <span data-i18n="capture">截图</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="options-section">
+                <div class="options-title">
+                    <span>⚙️</span>
+                    <span data-i18n="options">截图选项</span>
+                </div>
+                <div class="options-grid">
+                    <div class="option-group">
+                        <label class="option-label" data-i18n="width">宽度 (px)</label>
+                        <input type="number" class="option-input" id="widthInput" value="1280" min="320" max="3840">
+                    </div>
+                    <div class="option-group">
+                        <label class="option-label" data-i18n="height">高度 (px)</label>
+                        <input type="number" class="option-input" id="heightInput" value="720" min="240" max="2160">
+                    </div>
+                    <div class="option-group">
+                        <label class="option-label" data-i18n="format">格式</label>
+                        <select class="option-input" id="formatSelect">
+                            <option value="png">PNG</option>
+                            <option value="jpeg">JPEG</option>
+                            <option value="webp">WebP</option>
+                        </select>
+                    </div>
+                    <div class="option-group">
+                        <label class="option-label" data-i18n="delay">延迟 (秒)</label>
+                        <input type="number" class="option-input" id="delayInput" value="2" min="0" max="10" step="0.5">
+                    </div>
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p class="loading-text" data-i18n="loading">正在生成截图...</p>
+            </div>
+
+            <div class="result-section" id="resultSection">
+                <div class="result-header">
+                    <h3 class="result-title" data-i18n="result">截图结果</h3>
+                    <a href="#" class="download-btn" id="downloadBtn" download>
+                        <span>⬇️</span>
+                        <span data-i18n="download">下载图片</span>
+                    </a>
+                </div>
+                <div class="screenshot-container">
+                    <img class="screenshot-img" id="screenshotImg" alt="Screenshot">
+                </div>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3 class="feature-title" data-i18n="feature1Title">自定义尺寸</h3>
+                <p class="feature-desc" data-i18n="feature1Desc">支持自定义截图宽度和高度，适应不同设备屏幕</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title" data-i18n="feature2Title">快速生成</h3>
+                <p class="feature-desc" data-i18n="feature2Desc">使用现代浏览器技术，快速捕获高质量网页截图</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title" data-i18n="feature3Title">隐私安全</h3>
+                <p class="feature-desc" data-i18n="feature3Desc">截图在本地生成，数据不会上传到服务器</p>
+            </div>
+        </div>
+
+        <footer>
+            <p data-i18n="footer">Made with 💕 by kanshaowz | <a href="https://github.com/kanshaowz/screenshot" target="_blank">GitHub</a></p>
+        </footer>
+    </div>
+
+    <!-- Hidden iframe for capturing -->
+    <iframe id="captureFrame" sandbox="allow-same-origin allow-scripts"></iframe>
+
+    <script>
+        // Translations
+        const translations = {
+            zh: {
+                title: "Screenshot",
+                tagline: "轻松截取网页截图，支持自定义尺寸",
+                urlPlaceholder: "https://example.com",
+                capture: "截图",
+                options: "截图选项",
+                width: "宽度 (px)",
+                height: "高度 (px)",
+                format: "格式",
+                delay: "延迟 (秒)",
+                loading: "正在生成截图...",
+                result: "截图结果",
+                download: "下载图片",
+                feature1Title: "自定义尺寸",
+                feature1Desc: "支持自定义截图宽度和高度，适应不同设备屏幕",
+                feature2Title: "快速生成",
+                feature2Desc: "使用现代浏览器技术，快速捕获高质量网页截图",
+                feature3Title: "隐私安全",
+                feature3Desc: "截图在本地生成，数据不会上传到服务器",
+                footer: "Made with 💕 by kanshaowz",
+                errorInvalidUrl: "请输入有效的网址",
+                errorCors: "无法截图该网站（CORS限制），请尝试其他网站",
+                errorGeneric: "截图失败，请重试"
+            },
+            en: {
+                title: "Screenshot",
+                tagline: "Capture webpage screenshots with custom dimensions",
+                urlPlaceholder: "https://example.com",
+                capture: "Capture",
+                options: "Capture Options",
+                width: "Width (px)",
+                height: "Height (px)",
+                format: "Format",
+                delay: "Delay (sec)",
+                loading: "Generating screenshot...",
+                result: "Screenshot Result",
+                download: "Download Image",
+                feature1Title: "Custom Size",
+                feature1Desc: "Customize screenshot width and height for any device",
+                feature2Title: "Fast Generation",
+                feature2Desc: "Modern browser technology for quick, high-quality captures",
+                feature3Title: "Privacy Safe",
+                feature3Desc: "Screenshots generated locally, no data sent to servers",
+                footer: "Made with 💕 by kanshaowz",
+                errorInvalidUrl: "Please enter a valid URL",
+                errorCors: "Cannot screenshot this website (CORS restriction), try another",
+                errorGeneric: "Screenshot failed, please try again"
+            },
+            es: {
+                title: "Screenshot",
+                tagline: "Captura pantallas de sitios web con dimensiones personalizadas",
+                urlPlaceholder: "https://example.com",
+                capture: "Capturar",
+                options: "Opciones",
+                width: "Ancho (px)",
+                height: "Alto (px)",
+                format: "Formato",
+                delay: "Retraso (seg)",
+                loading: "Generando captura...",
+                result: "Resultado",
+                download: "Descargar",
+                feature1Title: "Tamaño Personalizado",
+                feature1Desc: "Personaliza el ancho y alto para cualquier dispositivo",
+                feature2Title: "Generación Rápida",
+                feature2Desc: "Tecnología moderna para capturas rápidas y de alta calidad",
+                feature3Title: "Privacidad Segura",
+                feature3Desc: "Capturas generadas localmente, sin datos en servidores",
+                footer: "Hecho con 💕 por kanshaowz",
+                errorInvalidUrl: "Ingresa una URL válida",
+                errorCors: "No se puede capturar (restricción CORS), prueba otro sitio",
+                errorGeneric: "Error al capturar, inténtalo de nuevo"
+            },
+            ja: {
+                title: "Screenshot",
+                tagline: "カスタムサイズでウェブページをスクリーンショット",
+                urlPlaceholder: "https://example.com",
+                capture: "撮影",
+                options: "オプション",
+                width: "幅 (px)",
+                height: "高さ (px)",
+                format: "形式",
+                delay: "遅延 (秒)",
+                loading: "スクリーンショット生成中...",
+                result: "結果",
+                download: "ダウンロード",
+                feature1Title: "カスタムサイズ",
+                feature1Desc: "任意のデバイスに合わせて幅と高さをカスタマイズ",
+                feature2Title: "高速生成",
+                feature2Desc: "最新のブラウザ技術で高品質なスクリーンショットを高速生成",
+                feature3Title: "プライバシー保護",
+                feature3Desc: "ローカルで生成、サーバーにデータは送信されません",
+                footer: "💕を込めて kanshaowz が作成",
+                errorInvalidUrl: "有効なURLを入力してください",
+                errorCors: "このウェブサイトは撮影できません（CORS制限）",
+                errorGeneric: "撮影に失敗しました、もう一度お試しください"
+            },
+            ko: {
+                title: "Screenshot",
+                tagline: "사용자 지정 크기로 웹페이지 스크린샷",
+                urlPlaceholder: "https://example.com",
+                capture: "캡처",
+                options: "옵션",
+                width: "너비 (px)",
+                height: "높이 (px)",
+                format: "형식",
+                delay: "지연 (초)",
+                loading: "스크린샷 생성 중...",
+                result: "결과",
+                download: "다운로드",
+                feature1Title: "사용자 지정 크기",
+                feature1Desc: "모든 기기에 맞게 너비와 높이를 사용자 지정",
+                feature2Title: "빠른 생성",
+                feature2Desc: "최신 브라우저 기술로 고품질 스크린샷을 빠르게 생성",
+                feature3Title: "개인정보 보호",
+                feature3Desc: "로컬에서 생성, 서버로 데이터가 전송되지 않음",
+                footer: "💕으로 만든 kanshaowz",
+                errorInvalidUrl: "유효한 URL을 입력하세요",
+                errorCors: "이 웹사이트를 캡처할 수 없습니다(CORS 제한)",
+                errorGeneric: "캡처에 실패했습니다. 다시 시도하세요"
+            }
+        };
+
+        let currentLang = 'zh';
+
+        // Language switcher
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentLang = btn.dataset.lang;
+                updateLanguage();
+            });
+        });
+
+        function updateLanguage() {
+            const t = translations[currentLang];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.dataset.i18n;
+                if (t[key]) el.textContent = t[key];
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.dataset.i18nPlaceholder;
+                if (t[key]) el.placeholder = t[key];
+            });
+        }
+
+        // Screenshot functionality
+        const captureBtn = document.getElementById('captureBtn');
+        const urlInput = document.getElementById('urlInput');
+        const loading = document.getElementById('loading');
+        const resultSection = document.getElementById('resultSection');
+        const screenshotImg = document.getElementById('screenshotImg');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        captureBtn.addEventListener('click', async () => {
+            const url = urlInput.value.trim();
+            if (!url || !isValidUrl(url)) {
+                alert(translations[currentLang].errorInvalidUrl);
+                return;
+            }
+
+            const width = parseInt(document.getElementById('widthInput').value) || 1280;
+            const height = parseInt(document.getElementById('heightInput').value) || 720;
+            const format = document.getElementById('formatSelect').value;
+            const delay = parseFloat(document.getElementById('delayInput').value) || 2;
+
+            loading.classList.add('active');
+            resultSection.classList.remove('active');
+            captureBtn.disabled = true;
+
+            try {
+                // Use a screenshot API service (free tier)
+                const apiUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&viewport.width=${width}&viewport.height=${height}&waitForTimeout=${delay * 1000}`;
+                
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (data.status === 'success' && data.data && data.data.screenshot) {
+                    const screenshotUrl = data.data.screenshot.url;
+                    screenshotImg.src = screenshotUrl;
+                    
+                    // Setup download
+                    downloadBtn.href = screenshotUrl;
+                    downloadBtn.download = `screenshot-${Date.now()}.${format}`;
+                    
+                    resultSection.classList.add('active');
+                } else {
+                    throw new Error('Screenshot failed');
+                }
+            } catch (error) {
+                console.error('Screenshot error:', error);
+                // Fallback: try alternative API
+                try {
+                    const fallbackUrl = `https://api.peekalink.io/?link=${encodeURIComponent(url)}`;
+                    const response = await fetch(fallbackUrl, {
+                        headers: {
+                            'Authorization': 'Bearer 4b37a92b-5c27-4c6c-9d3e-1e6f9a2b4c8d'
+                        }
+                    });
+                    const data = await response.json();
+                    
+                    if (data.screenshotUrl) {
+                        screenshotImg.src = data.screenshotUrl;
+                        downloadBtn.href = data.screenshotUrl;
+                        downloadBtn.download = `screenshot-${Date.now()}.${format}`;
+                        resultSection.classList.add('active');
+                    } else {
+                        alert(translations[currentLang].errorCors);
+                    }
+                } catch (fallbackError) {
+                    alert(translations[currentLang].errorCors);
+                }
+            } finally {
+                loading.classList.remove('active');
+                captureBtn.disabled = false;
+            }
+        });
+
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        // Enter key support
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                captureBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
