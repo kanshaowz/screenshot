@@ -19,11 +19,38 @@
             --text-medium: #8b6b73;
             --text-light: #b89aa1;
             --white: #ffffff;
+            --bg-card: #ffffff;
+            --bg-input: #ffffff;
+            --border-color: #ffe4e9;
             --shadow-soft: 0 8px 32px rgba(255, 143, 163, 0.15);
             --shadow-hover: 0 12px 40px rgba(255, 143, 163, 0.25);
             --radius-lg: 24px;
             --radius-md: 16px;
             --radius-sm: 12px;
+        }
+
+        /* Dark Mode */
+        .dark-mode {
+            --primary: #ff6b85;
+            --primary-dark: #ff8fa3;
+            --primary-light: #ffc2cd;
+            --primary-soft: #3d2529;
+            --secondary: #5a3d44;
+            --bg-gradient-start: #1a1214;
+            --bg-gradient-end: #2d1f23;
+            --text-dark: #ffe4e9;
+            --text-medium: #ffc2cd;
+            --text-light: #ff8fa3;
+            --white: #2d1f23;
+            --bg-card: #2d1f23;
+            --bg-input: #3d2529;
+            --border-color: #5a3d44;
+            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .dark-mode body {
+            background: linear-gradient(135deg, #1a1214 0%, #2d1f23 100%);
         }
 
         * {
@@ -492,6 +519,7 @@
     </div>
 
     <div class="container">
+        <button id="darkModeBtn" onclick="toggleDarkMode()" title="切换主题" style="position: fixed; top: 20px; right: 20px; width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--border-color); background: var(--bg-card); cursor: pointer; font-size: 20px; z-index: 1000; transition: all 0.3s;">🌙</button>
         <header>
             <div class="logo">
                 <div class="logo-icon">📸</div>
@@ -821,6 +849,32 @@
                 captureBtn.click();
             }
         });
+
+        // Dark Mode
+        const STORAGE_KEY = 'screenshot-theme';
+        const DARK_CLASS = 'dark-mode';
+
+        function initDarkMode() {
+            const savedTheme = localStorage.getItem(STORAGE_KEY);
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add(DARK_CLASS);
+                updateDarkModeIcon(true);
+            }
+        }
+
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle(DARK_CLASS);
+            localStorage.setItem(STORAGE_KEY, isDark ? 'dark' : 'light');
+            updateDarkModeIcon(isDark);
+        }
+
+        function updateDarkModeIcon(isDark) {
+            const btn = document.getElementById('darkModeBtn');
+            if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+        }
+
+        initDarkMode();
     </script>
 </body>
 </html>
